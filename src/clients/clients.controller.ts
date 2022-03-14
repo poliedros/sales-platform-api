@@ -7,11 +7,11 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Costumer, CostumersService } from './costumers.service';
+import { Client, ClientsService } from './clients.service';
 
 @Controller('costumers')
 export class CostumersController {
-  constructor(private readonly costumerService: CostumersService) {}
+  constructor(private readonly costumerService: ClientsService) {}
 
   @Get()
   async get() {
@@ -19,12 +19,12 @@ export class CostumersController {
   }
 
   @Post()
-  async create(@Body() costumer: Costumer) {
+  async create(@Body() costumer: Client) {
     return this.costumerService.create(costumer);
   }
 
   @Put()
-  async update(@Body() costumer: Costumer) {
+  async update(@Body() costumer: Client) {
     return this.costumerService.update(costumer);
   }
 

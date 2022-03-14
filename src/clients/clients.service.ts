@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-export class Costumer {
+export class Client {
   id: string;
   name: string;
   type: string;
@@ -12,8 +12,8 @@ export class Costumer {
 }
 
 @Injectable()
-export class CostumersService {
-  costumers: Costumer[] = [
+export class ClientsService {
+  costumers: Client[] = [
     {
       id: '1',
       name: 'Anderson',
@@ -36,20 +36,20 @@ export class CostumersService {
     },
   ];
 
-  async findAll(): Promise<Costumer[]> | undefined {
+  async findAll(): Promise<Client[]> | undefined {
     return this.costumers;
   }
 
-  async find(id: string): Promise<Costumer> | undefined {
+  async find(id: string): Promise<Client> | undefined {
     return this.costumers.find((costumer) => costumer.id === id);
   }
 
-  async create(costumer: Costumer): Promise<Costumer> {
+  async create(costumer: Client): Promise<Client> {
     this.costumers.push(costumer);
     return costumer;
   }
 
-  async update(newCostumer: Costumer): Promise<Costumer> {
+  async update(newCostumer: Client): Promise<Client> {
     let costumer = this.costumers.find((old) => old.id == newCostumer.id);
     costumer = newCostumer;
     return costumer;
