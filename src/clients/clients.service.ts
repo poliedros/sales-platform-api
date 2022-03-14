@@ -13,7 +13,7 @@ export class Client {
 
 @Injectable()
 export class ClientsService {
-  costumers: Client[] = [
+  clients: Client[] = [
     {
       id: '1',
       name: 'Anderson',
@@ -37,26 +37,26 @@ export class ClientsService {
   ];
 
   async findAll(): Promise<Client[]> | undefined {
-    return this.costumers;
+    return this.clients;
   }
 
   async find(id: string): Promise<Client> | undefined {
-    return this.costumers.find((costumer) => costumer.id === id);
+    return this.clients.find((costumer) => costumer.id === id);
   }
 
-  async create(costumer: Client): Promise<Client> {
-    this.costumers.push(costumer);
-    return costumer;
+  async create(client: Client): Promise<Client> {
+    this.clients.push(client);
+    return client;
   }
 
-  async update(newCostumer: Client): Promise<Client> {
-    let costumer = this.costumers.find((old) => old.id == newCostumer.id);
-    costumer = newCostumer;
+  async update(newClient: Client): Promise<Client> {
+    let costumer = this.clients.find((old) => old.id == newClient.id);
+    costumer = newClient;
     return costumer;
   }
 
   async delete(id: string): Promise<boolean> {
-    this.costumers = this.costumers.filter((costumer) => costumer.id !== id);
+    this.clients = this.clients.filter((client) => client.id !== id);
     return true;
   }
 }
