@@ -131,7 +131,6 @@ export class ClientsService {
     productId: string,
   ): Promise<Product> {
     const client = this.clients.find((client) => client.name === clientName);
-    console.log(client);
     const product = client.products.find((product) => product.id === productId);
     return product;
   }
