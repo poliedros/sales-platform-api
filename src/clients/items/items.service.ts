@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-export class Product {
+export class item {
   id: string;
   name: string;
   type: string;
@@ -14,8 +14,8 @@ export class Product {
 }
 
 @Injectable()
-export class ProductsService {
-  products: Product[] = [
+export class ItemsService {
+  Items: item[] = [
     {
       id: '1',
       name: 'Water',
@@ -42,27 +42,27 @@ export class ProductsService {
     },
   ];
 
-  async findAll(): Promise<Product[]> | undefined {
-    return this.products;
+  async findAll(): Promise<item[]> | undefined {
+    return this.Items;
   }
 
-  async find(id: string): Promise<Product> | undefined {
-    return this.products.find((product) => product.id === id);
+  async find(id: string): Promise<item> | undefined {
+    return this.Items.find((item) => item.id === id);
   }
 
-  async create(product: Product): Promise<Product> {
-    this.products.push(product);
-    return product;
+  async create(item: item): Promise<item> {
+    this.Items.push(item);
+    return item;
   }
 
-  async update(newProduct: Product): Promise<Product> {
-    let product = this.products.find((old) => old.id == newProduct.id);
-    product = newProduct;
-    return product;
+  async update(newitem: item): Promise<item> {
+    let item = this.Items.find((old) => old.id == newitem.id);
+    item = newitem;
+    return item;
   }
 
   async delete(id: string): Promise<boolean> {
-    this.products = this.products.filter((product) => product.id !== id);
+    this.Items = this.Items.filter((item) => item.id !== id);
 
     return true;
   }

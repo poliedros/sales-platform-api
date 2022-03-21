@@ -9,10 +9,10 @@ export class Client {
   address: string;
   additionalInfo: string;
   code: string;
-  products: Product[];
+  items: Item[];
 }
 
-export class Product {
+export class Item {
   id: string;
   name: string;
   type: string;
@@ -38,7 +38,7 @@ export class ClientsService {
       address: '1 wd',
       additionalInfo: 'a very good costumer',
       code: '1',
-      products: [
+      items: [
         {
           id: '1',
           name: 'Anderson Water',
@@ -63,7 +63,7 @@ export class ClientsService {
       address: '1 wd',
       additionalInfo: 'a very very good costumer',
       code: '2',
-      products: [
+      items: [
         {
           id: '1',
           name: 'Carlos Water',
@@ -109,61 +109,53 @@ export class ClientsService {
     return true;
   }
 
-  async findProductsByClientId(clientId: string): Promise<Product[]> {
-    return this.clients.find((client) => client.id === clientId).products;
+  async findItemsByClientId(clientId: string): Promise<Item[]> {
+    return this.clients.find((client) => client.id === clientId).items;
   }
 
-  async findProductsByClientName(clientName: string): Promise<Product[]> {
-    return this.clients.find((client) => client.name === clientName).products;
+  async findItemsByClientName(clientName: string): Promise<Item[]> {
+    return this.clients.find((client) => client.name === clientName).items;
   }
 
-  async findProductByClientIdAndProductId(
+  async findItemByClientIdAnditemId(
     clientId: string,
-    productId: string,
-  ): Promise<Product> {
+    itemId: string,
+  ): Promise<Item> {
     const client = this.clients.find((client) => client.id === clientId);
-    const product = client.products.find((product) => product.id === productId);
-    return product;
+    const item = client.items.find((item) => item.id === itemId);
+    return item;
   }
 
-  async findProductByClientNameAndProductId(
+  async finditemByClientNameAnditemId(
     clientName: string,
-    productId: string,
-  ): Promise<Product> {
+    itemId: string,
+  ): Promise<Item> {
     const client = this.clients.find((client) => client.name === clientName);
-    const product = client.products.find((product) => product.id === productId);
-    return product;
+    const item = client.items.find((item) => item.id === itemId);
+    return item;
   }
 
-  async createProduct(product: Product): Promise<Product> {
-    this.clients
-      .find((client) => client.id == product.clientId)
-      .products.push(product);
+  async createItem(item: Item): Promise<Item> {
+    this.clients.find((client) => client.id == item.clientId).items.push(item);
 
-    return product;
+    return item;
   }
 
-  async updateProductByClientId(
-    clientId: string,
-    product: Product,
-  ): Promise<Product> {
+  async updateItemByClientId(clientId: string, item: Item): Promise<Item> {
     const client = this.clients.find((old) => old.id === clientId);
-    client.products.push(product);
-    return product;
+    client.items.push(item);
+    return item;
   }
 
-  async updateProductByClientName(
-    clientName: string,
-    product: Product,
-  ): Promise<Product> {
+  async updateItemByClientName(clientName: string, item: Item): Promise<Item> {
     const client = this.clients.find((old) => old.name === clientName);
-    client.products.push(product);
-    return product;
+    client.items.push(item);
+    return item;
   }
 
-  async deleteProductByClientName(
+  async deleteItemByClientName(
     clientName: string,
-    productId: string,
+    itemId: string,
   ): Promise<boolean> {
     return true;
   }
