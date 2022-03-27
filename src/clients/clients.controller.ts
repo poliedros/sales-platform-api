@@ -3,12 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
-  Res,
 } from '@nestjs/common';
 import { Client, ClientsService } from './clients.service';
 
@@ -27,7 +25,7 @@ export class ClientsController {
 
     if (client) return client;
 
-    throw new HttpException('Client not found', HttpStatus.NOT_FOUND);
+    throw new NotFoundException('Client not found');
   }
 
   @Post()
@@ -43,5 +41,10 @@ export class ClientsController {
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.clientsService.delete(id);
+  }
+
+  @Post(':name/send-email')
+  async sendEmail(@Body() email: string) {
+    return true;
   }
 }
