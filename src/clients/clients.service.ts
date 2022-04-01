@@ -10,100 +10,62 @@ export class ClientsService {
   ) {}
 
   async findAll(): Promise<Client[]> | undefined {
-    return this.clientRepository.getData();
+    return this.clientModel.find().exec();
   }
 
   async findById(id: string): Promise<Client> | undefined {
-    return this.clientRepository.getData().find((client) => client.id === id);
+    return this.clientModel.findById(id).exec();
   }
 
   async findByName(clientName: string): Promise<Client> | undefined {
-    return this.clientRepository
-      .getData()
-      .find((client) => client.name === clientName);
+    return this.clientModel.findOne({ where: { name: clientName } }).exec();
   }
 
-  async create(client: Client): Promise<Client> {
-    this.clientRepository.getData().push(client);
-    return client;
+  async create(client: Client) {
+    const createdClient = new this.clientModel(client);
+    return createdClient.save();
   }
 
-  async update(newClient: Client): Promise<Client> {
-    let client = this.clientRepository
-      .getData()
-      .find((old) => old.id === newClient.id);
-    client = newClient;
-    return client;
+  async update(newClient: Client) {
+    const updatedClient = new this.clientModel(newClient);
+
+    return updatedClient.update().exec();
   }
 
-  async delete(id: string): Promise<boolean> {
-    this.clientRepository.getData().filter((client) => client.id !== id);
-    return true;
+  async delete(id: string) {
+    return this.clientModel.deleteOne({ where: { _id: id } }).exec();
   }
 
-  async findItemsByClientId(clientId: string): Promise<Item[]> {
-    return this.clientRepository
-      .getData()
-      .find((client) => client.id === clientId).items;
+  async findItemsByClientId(clientId: string) {
+    // return this.clientModel.findOne({ where: { clientId: clientId } }).exec();
   }
 
-  async findItemsByClientName(clientName: string): Promise<Item[]> {
-    return this.clientRepository
-      .getData()
-      .find((client) => client.name === clientName).items;
+  async findItemsByClientName(clientName: string) {
+    // return this.clientModel
+    //   .findOne({ where: { clientName: clientName } })
+    //   .exec();
   }
 
-  async findItemByClientIdAnditemId(
-    clientId: string,
-    itemId: string,
-  ): Promise<Item> {
-    const client = this.clientRepository
-      .getData()
-      .find((client) => client.id === clientId);
-    const item = client.items.find((item) => item.id === itemId);
-    return item;
+  async findItemByClientIdAnditemId(clientId: string, itemId: string) {
+    // return this.clientModel
+    //   .findOne({ where: { clientId: clientId, itemId: itemId } })
+    //   .exec();
   }
 
-  async finditemByClientNameAnditemId(
-    clientName: string,
-    itemId: string,
-  ): Promise<Item> {
-    const client = this.clientRepository
-      .getData()
-      .find((client) => client.name === clientName);
-    const item = client.items.find((item) => item.id === itemId);
-    return item;
+  async findItemByClientNameAndItemId(clientName: string, itemId: string) {
+    // return this.clientModel
+    //   .findOne({ where: { clientName: clientName, itemId: itemId } })
+    //   .exec();
   }
 
-  async createItem(item: Item): Promise<Item> {
-    this.clientRepository
-      .getData()
-      .find((client) => client.id == item.clientId)
-      .items.push(item);
+  async createItem(item: Item): Promise<Item> {}
 
-    return item;
-  }
+  async updateItemByClientId(clientId: string, item: Item): Promise<Item> {}
 
-  async updateItemByClientId(clientId: string, item: Item): Promise<Item> {
-    const client = this.clientRepository
-      .getData()
-      .find((old) => old.id === clientId);
-    client.items.push(item);
-    return item;
-  }
-
-  async updateItemByClientName(clientName: string, item: Item): Promise<Item> {
-    const client = this.clientRepository
-      .getData()
-      .find((old) => old.name === clientName);
-    client.items.push(item);
-    return item;
-  }
+  async updateItemByClientName(clientName: string, item: Item): Promise<Item> {}
 
   async deleteItemByClientName(
     clientName: string,
     itemId: string,
-  ): Promise<boolean> {
-    return true;
-  }
+  ): Promise<boolean> {}
 }
