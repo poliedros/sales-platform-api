@@ -9,7 +9,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { ClientsService, Item } from '../clients.service';
+import { ClientsService } from '../clients.service';
+import { Item } from '../schemas/item.schema';
 
 @Controller('clients/:client_name')
 export class ItemsController {
@@ -22,7 +23,7 @@ export class ItemsController {
 
   @Get('/items/:item_id')
   async getById(@Param('client_name') clientName, @Param('item_id') itemId) {
-    const item = await this.clientsService.finditemByClientNameAnditemId(
+    const item = await this.clientsService.findItemByClientNameAndItemId(
       clientName,
       itemId,
     );
@@ -36,7 +37,7 @@ export class ItemsController {
   async create(@Param('client_name') clientName, @Body() item: Item) {
     const client = await this.clientsService.findByName(clientName);
 
-    item.clientId = client.id;
+    item.clientId = client._id;
     return this.clientsService.createItem(item);
   }
 

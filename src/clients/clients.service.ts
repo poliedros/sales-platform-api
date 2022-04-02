@@ -2,11 +2,13 @@ import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Client, ClientDocument } from './schemas/client.schema';
+import { Item, ItemDocument } from './schemas/item.schema';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectModel(Client.name) private clientModel: Model<ClientDocument>,
+    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
   ) {}
 
   async findAll(): Promise<Client[]> | undefined {
@@ -18,7 +20,7 @@ export class ClientsService {
   }
 
   async findByName(clientName: string): Promise<Client> | undefined {
-    return this.clientModel.findOne({ where: { name: clientName } }).exec();
+    return await this.clientModel.findOne({ name: clientName }).exec();
   }
 
   async create(client: Client) {
@@ -27,7 +29,10 @@ export class ClientsService {
   }
 
   async update(newClient: Client) {
-    const updatedClient = new this.clientModel(newClient);
+    const updatedClient = this.clientModel.findByIdAndUpdate(
+      newClient._id,
+      newClient,
+    );
 
     return updatedClient.update().exec();
   }
@@ -37,35 +42,47 @@ export class ClientsService {
   }
 
   async findItemsByClientId(clientId: string) {
-    // return this.clientModel.findOne({ where: { clientId: clientId } }).exec();
+    return this.itemModel.find({ where: { clientId: clientId } }).exec();
   }
 
   async findItemsByClientName(clientName: string) {
-    // return this.clientModel
-    //   .findOne({ where: { clientName: clientName } })
-    //   .exec();
+    return this.itemModel.find({ where: { clientName: clientName } }).exec();
   }
 
   async findItemByClientIdAnditemId(clientId: string, itemId: string) {
-    // return this.clientModel
-    //   .findOne({ where: { clientId: clientId, itemId: itemId } })
-    //   .exec();
+    return this.itemModel
+      .findOne({ where: { clientId: clientId, itemId: itemId } })
+      .exec();
   }
 
   async findItemByClientNameAndItemId(clientName: string, itemId: string) {
-    // return this.clientModel
-    //   .findOne({ where: { clientName: clientName, itemId: itemId } })
-    //   .exec();
+    return this.itemModel
+      .findOne({ where: { clientName: clientName, itemId: itemId } })
+      .exec();
   }
 
-  async createItem(item: Item): Promise<Item> {}
+  async createItem(item: Item): Promise<Item> {
+    const createdItem = new this.itemModel(item);
+    return createdItem.save();
+  }
 
-  async updateItemByClientId(clientId: string, item: Item): Promise<Item> {}
+  // TODO: take a look
+  async updateItemByClientId(clientId: string, item: Item): Promise<Item> {
+    const updatedItem = new this.itemModel(item);
 
-  async updateItemByClientName(clientName: string, item: Item): Promise<Item> {}
+    return updatedItem.update().exec();
+  }
 
-  async deleteItemByClientName(
-    clientName: string,
-    itemId: string,
-  ): Promise<boolean> {}
+  // TODO: take a look
+  async updateItemByClientName(clientName: string, item: Item): Promise<Item> {
+    const updatedItem = new this.itemModel(item);
+
+    return updatedItem.update().exec();
+  }
+
+  async deleteItemByClientName(clientName: string, itemId: string) {
+    return this.itemModel
+      .deleteOne({ where: { _id: itemId, clientName: clientName } })
+      .exec();
+  }
 }

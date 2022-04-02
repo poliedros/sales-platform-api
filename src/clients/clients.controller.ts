@@ -8,7 +8,8 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { Client, ClientsService } from './clients.service';
+import { ClientsService } from './clients.service';
+import { Client } from './schemas/client.schema';
 
 @Controller('clients')
 export class ClientsController {

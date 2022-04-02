@@ -6,8 +6,7 @@ export type ClientDocument = Client & Document;
 
 @Schema()
 export class Client {
-  @Prop()
-  id: string;
+  _id: string;
 
   @Prop()
   name: string;
