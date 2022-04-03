@@ -1,14 +1,19 @@
-import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { randomUUID } from 'crypto';
 import { Client, ClientDocument } from './schemas/client.schema';
-import { Item, ItemDocument } from './schemas/item.schema';
+import { CreateItemDto } from './dto/create-item.dto';
+import { Item } from './schemas/item';
+import { ItemDto } from './dto/item.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
+import { ItemFactory } from './providers/item.factory';
 
 @Injectable()
 export class ClientsService {
   constructor(
     @InjectModel(Client.name) private clientModel: Model<ClientDocument>,
-    @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+    private readonly itemFactory: ItemFactory,
   ) {}
 
   async findAll(): Promise<Client[]> | undefined {
@@ -38,51 +43,128 @@ export class ClientsService {
   }
 
   async delete(id: string) {
-    return this.clientModel.deleteOne({ where: { _id: id } }).exec();
+    return this.clientModel.deleteOne({ _id: id }).exec();
   }
 
   async findItemsByClientId(clientId: string) {
-    return this.itemModel.find({ where: { clientId: clientId } }).exec();
+    const client = await this.clientModel
+      .findOne({ where: { clientId: clientId } })
+      .exec();
+
+    return client.items;
   }
 
   async findItemsByClientName(clientName: string) {
-    return this.itemModel.find({ where: { clientName: clientName } }).exec();
+    const client = await this.clientModel
+      .findOne({ clientName: clientName })
+      .exec();
+
+    return client.items;
   }
 
-  async findItemByClientIdAnditemId(clientId: string, itemId: string) {
-    return this.itemModel
-      .findOne({ where: { clientId: clientId, itemId: itemId } })
-      .exec();
+  async findItemByClientIdAndItemId(clientId: string, itemId: string) {
+    const client = await this.clientModel.findOne({ _id: clientId }).exec();
+
+    return client.items.find((x) => x._id == itemId);
   }
 
   async findItemByClientNameAndItemId(clientName: string, itemId: string) {
-    return this.itemModel
-      .findOne({ where: { clientName: clientName, itemId: itemId } })
+    const client = await this.clientModel.findOne({ name: clientName }).exec();
+
+    return client.items.find((x) => x._id == itemId);
+  }
+
+  async createItem(
+    client: Client,
+    createItemDto: CreateItemDto,
+  ): Promise<ItemDto> {
+    const item = this.itemFactory.ToItem(createItemDto);
+
+    item._id = randomUUID();
+    const items = client.items;
+    items.push(item);
+
+    console.log(items);
+
+    await this.clientModel
+      .findByIdAndUpdate(client._id, { ...client, items: items })
       .exec();
+
+    const itemDto = this.itemFactory.ToDto(item, client._id);
+    return itemDto;
   }
 
-  async createItem(item: Item): Promise<Item> {
-    const createdItem = new this.itemModel(item);
-    return createdItem.save();
+  async updateItemByClientId(
+    clientId: string,
+    updateItemDto: UpdateItemDto,
+  ): Promise<Item> {
+    const client = await this.clientModel.findOne({ _id: clientId }).exec();
+
+    if (!client) throw new NotFoundException('Client not found');
+
+    const index = client.items.findIndex(
+      (itemDto) => itemDto._id === updateItemDto._id,
+    );
+    client.items[index] = {
+      _id: updateItemDto._id,
+      name: updateItemDto.name,
+      description: updateItemDto.description,
+      image: updateItemDto.image,
+      label: updateItemDto.label,
+      note: updateItemDto.note,
+      price: updateItemDto.price,
+      quantity: updateItemDto.quantity,
+      type: updateItemDto.type,
+      code: updateItemDto.code,
+    };
+
+    await this.clientModel.findByIdAndUpdate(client._id, client);
+
+    const itemDto = this.itemFactory.ToDto(updateItemDto, client._id);
+    return itemDto;
   }
 
-  // TODO: take a look
-  async updateItemByClientId(clientId: string, item: Item): Promise<Item> {
-    const updatedItem = new this.itemModel(item);
+  async updateItemByClientName(
+    clientName: string,
+    updateItemDto: UpdateItemDto,
+  ): Promise<Item> {
+    const client = await this.clientModel.findOne({ name: clientName }).exec();
 
-    return updatedItem.update().exec();
-  }
+    const index = client.items.findIndex(
+      (itemDto) => itemDto._id === updateItemDto._id,
+    );
+    client.items[index] = {
+      _id: updateItemDto._id,
+      name: updateItemDto.name,
+      description: updateItemDto.description,
+      image: updateItemDto.image,
+      label: updateItemDto.label,
+      note: updateItemDto.note,
+      price: updateItemDto.price,
+      quantity: updateItemDto.quantity,
+      type: updateItemDto.type,
+      code: updateItemDto.code,
+    };
 
-  // TODO: take a look
-  async updateItemByClientName(clientName: string, item: Item): Promise<Item> {
-    const updatedItem = new this.itemModel(item);
+    await this.clientModel.findByIdAndUpdate(client._id, client);
 
-    return updatedItem.update().exec();
+    const itemDto = this.itemFactory.ToDto(updateItemDto, client._id);
+    return itemDto;
   }
 
   async deleteItemByClientName(clientName: string, itemId: string) {
-    return this.itemModel
-      .deleteOne({ where: { _id: itemId, clientName: clientName } })
-      .exec();
+    const client = await this.clientModel.findOne({ name: clientName }).exec();
+
+    if (!client) throw new NotFoundException('Client not found');
+
+    const updatedItems = client.items.filter(
+      (itemDto) => itemDto._id !== itemId,
+    );
+
+    client.items = updatedItems;
+
+    await this.clientModel.findByIdAndUpdate(client._id, client);
+
+    return itemId;
   }
 }

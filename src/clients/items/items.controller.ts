@@ -1,3 +1,5 @@
+import { UpdateItemDto } from './../dto/update-item.dto';
+import { CreateItemDto } from './../dto/create-item.dto';
 import {
   Body,
   Controller,
@@ -5,12 +7,12 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
 import { ClientsService } from '../clients.service';
-import { Item } from '../schemas/item.schema';
 
 @Controller('clients/:client_name')
 export class ItemsController {
@@ -34,15 +36,19 @@ export class ItemsController {
   }
 
   @Post('/items')
-  async create(@Param('client_name') clientName, @Body() item: Item) {
+  async create(
+    @Param('client_name') clientName,
+    @Body() createItemDto: CreateItemDto,
+  ) {
     const client = await this.clientsService.findByName(clientName);
 
-    item.clientId = client._id;
-    return this.clientsService.createItem(item);
+    if (client) return this.clientsService.createItem(client, createItemDto);
+
+    throw new NotFoundException('Client not found');
   }
 
   @Put('/items')
-  async update(@Body('client_name') clientName, @Body() item: Item) {
+  async update(@Body('client_name') clientName, @Body() item: UpdateItemDto) {
     return this.clientsService.updateItemByClientName(clientName, item);
   }
 

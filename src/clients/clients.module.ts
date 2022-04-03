@@ -4,16 +4,13 @@ import { ClientsService } from './clients.service';
 import { ClientsController } from './clients.controller';
 import { ItemsController } from './items/items.controller';
 import { Client, ClientSchema } from './schemas/client.schema';
-import { Item, ItemSchema } from './schemas/item.schema';
+import { ItemFactory } from './providers/item.factory';
 
 @Module({
-  providers: [ClientsService],
+  providers: [ClientsService, ItemFactory],
   controllers: [ClientsController, ItemsController],
   imports: [
-    MongooseModule.forFeature([
-      { name: Client.name, schema: ClientSchema },
-      { name: Item.name, schema: ItemSchema },
-    ]),
+    MongooseModule.forFeature([{ name: Client.name, schema: ClientSchema }]),
   ],
 })
 export class ClientsModule {}
